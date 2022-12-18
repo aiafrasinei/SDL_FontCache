@@ -210,13 +210,6 @@ FC_Scale FC_MakeScale(float x, float y)
     return s;
 }
 
-SDL_Color FC_MakeColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
-{
-    SDL_Color c = {r, g, b, a};
-
-    return c;
-}
-
 FC_Effect FC_MakeEffect(FC_AlignEnum alignment, FC_Scale scale, SDL_Color color)
 {
     FC_Effect e;

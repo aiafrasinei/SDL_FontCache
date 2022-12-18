@@ -30,8 +30,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef _SDL_FONTCACHE_H__
-#define _SDL_FONTCACHE_H__
+#pragma once
+
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -88,8 +88,6 @@ typedef struct FC_GlyphData
 // Object creation
 
 FC_Scale FC_MakeScale(float x, float y);
-
-SDL_Color FC_MakeColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 FC_Effect FC_MakeEffect(FC_AlignEnum alignment, FC_Scale scale, SDL_Color color);
 
@@ -278,5 +276,3 @@ void FC_SetSpacing(FC_Font* font, int LetterSpacing);
 void FC_SetLineSpacing(FC_Font* font, int LineSpacing);
 void FC_SetDefaultColor(FC_Font* font, SDL_Color color);
 
-
-#endif
