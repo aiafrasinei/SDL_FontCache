@@ -33,39 +33,13 @@ THE SOFTWARE.
 #ifndef _SDL_FONTCACHE_H__
 #define _SDL_FONTCACHE_H__
 
-#include "SDL.h"
-#include "SDL_ttf.h"
-
-#ifdef FC_USE_SDL_GPU
-    #include "SDL_gpu.h"
-#endif
-
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include <stdarg.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 // Let's pretend this exists...
 #define TTF_STYLE_OUTLINE	16
-
-
-
-// Differences between SDL_Renderer and SDL_gpu
-#ifdef FC_USE_SDL_GPU
-#define FC_Rect GPU_Rect
-#define FC_Target GPU_Target
-#define FC_Image GPU_Image
-#define FC_Log GPU_LogError
-#else
-#define FC_Rect SDL_Rect
-#define FC_Target SDL_Renderer
-#define FC_Image SDL_Texture
-#define FC_Log SDL_Log
-#endif
-
 
 // SDL_FontCache types
 
@@ -113,8 +87,6 @@ typedef struct FC_GlyphData
 
 // Object creation
 
-FC_Rect FC_MakeRect(float x, float y, float w, float h);
-
 FC_Scale FC_MakeScale(float x, float y);
 
 SDL_Color FC_MakeColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
@@ -129,24 +101,13 @@ FC_GlyphData FC_MakeGlyphData(int cache_level, Sint16 x, Sint16 y, Uint16 w, Uin
 
 FC_Font* FC_CreateFont(void);
 
-#ifdef FC_USE_SDL_GPU
-Uint8 FC_LoadFont(FC_Font* font, const char* filename_ttf, Uint32 pointSize, SDL_Color color, int style);
-
-Uint8 FC_LoadFontFromTTF(FC_Font* font, TTF_Font* ttf, SDL_Color color);
-
-Uint8 FC_LoadFont_RW(FC_Font* font, SDL_RWops* file_rwops_ttf, Uint8 own_rwops, Uint32 pointSize, SDL_Color color, int style);
-#else
 Uint8 FC_LoadFont(FC_Font* font, SDL_Renderer* renderer, const char* filename_ttf, Uint32 pointSize, SDL_Color color, int style);
 
 Uint8 FC_LoadFontFromTTF(FC_Font* font, SDL_Renderer* renderer, TTF_Font* ttf, SDL_Color color);
 
 Uint8 FC_LoadFont_RW(FC_Font* font, SDL_Renderer* renderer, SDL_RWops* file_rwops_ttf, Uint8 own_rwops, Uint32 pointSize, SDL_Color color, int style);
-#endif
 
-#ifndef FC_USE_SDL_GPU
-// note: handle SDL event types SDL_RENDER_TARGETS_RESET(>= SDL 2.0.2) and SDL_RENDER_DEVICE_RESET(>= SDL 2.0.4)
 void FC_ResetFontFromRendererReset(FC_Font* font, SDL_Renderer* renderer, Uint32 evType);
-#endif
 
 void FC_ClearFont(FC_Font* font);
 
@@ -227,9 +188,9 @@ unsigned int FC_GetTabWidth(void);
 /*! Changes the width of a horizontal tab in multiples of the width of a space (default: 4) */
 void FC_SetTabWidth(unsigned int width_in_spaces);
 
-void FC_SetRenderCallback(FC_Rect (*callback)(FC_Image* src, FC_Rect* srcrect, FC_Target* dest, float x, float y, float xscale, float yscale));
+void FC_SetRenderCallback(SDL_Rect (*callback)(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, float x, float y, float xscale, float yscale));
 
-FC_Rect FC_DefaultRenderCallback(FC_Image* src, FC_Rect* srcrect, FC_Target* dest, float x, float y, float xscale, float yscale);
+SDL_Rect FC_DefaultRenderCallback(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, float x, float y, float xscale, float yscale);
 
 
 // Custom caching
@@ -238,11 +199,11 @@ FC_Rect FC_DefaultRenderCallback(FC_Image* src, FC_Rect* srcrect, FC_Target* des
 int FC_GetNumCacheLevels(FC_Font* font);
 
 /*! Returns the cache source texture at the given cache level. */
-FC_Image* FC_GetGlyphCacheLevel(FC_Font* font, int cache_level);
+SDL_Texture* FC_GetGlyphCacheLevel(FC_Font* font, int cache_level);
 
 // TODO: Specify ownership of the texture (should be shareable)
 /*! Sets a cache source texture for rendering.  New cache levels must be sequential. */
-Uint8 FC_SetGlyphCacheLevel(FC_Font* font, int cache_level, FC_Image* cache_texture);
+Uint8 FC_SetGlyphCacheLevel(FC_Font* font, int cache_level, SDL_Texture* cache_texture);
 
 /*! Copies the given surface to the given cache level as a texture.  New cache levels must be sequential. */
 Uint8 FC_UploadGlyphCache(FC_Font* font, int cache_level, SDL_Surface* data_surface);
@@ -263,23 +224,23 @@ FC_GlyphData* FC_SetGlyphData(FC_Font* font, Uint32 codepoint, FC_GlyphData glyp
 
 // Rendering
 
-FC_Rect FC_Draw(FC_Font* font, FC_Target* dest, float x, float y, const char* formatted_text, ...);
-FC_Rect FC_DrawAlign(FC_Font* font, FC_Target* dest, float x, float y, FC_AlignEnum align, const char* formatted_text, ...);
-FC_Rect FC_DrawScale(FC_Font* font, FC_Target* dest, float x, float y, FC_Scale scale, const char* formatted_text, ...);
-FC_Rect FC_DrawColor(FC_Font* font, FC_Target* dest, float x, float y, SDL_Color color, const char* formatted_text, ...);
-FC_Rect FC_DrawEffect(FC_Font* font, FC_Target* dest, float x, float y, FC_Effect effect, const char* formatted_text, ...);
+SDL_Rect FC_Draw(FC_Font* font, SDL_Renderer* dest, float x, float y, const char* formatted_text, ...);
+SDL_Rect FC_DrawAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_AlignEnum align, const char* formatted_text, ...);
+SDL_Rect FC_DrawScale(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* formatted_text, ...);
+SDL_Rect FC_DrawColor(FC_Font* font, SDL_Renderer* dest, float x, float y, SDL_Color color, const char* formatted_text, ...);
+SDL_Rect FC_DrawEffect(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Effect effect, const char* formatted_text, ...);
 
-FC_Rect FC_DrawBox(FC_Font* font, FC_Target* dest, FC_Rect box, const char* formatted_text, ...);
-FC_Rect FC_DrawBoxAlign(FC_Font* font, FC_Target* dest, FC_Rect box, FC_AlignEnum align, const char* formatted_text, ...);
-FC_Rect FC_DrawBoxScale(FC_Font* font, FC_Target* dest, FC_Rect box, FC_Scale scale, const char* formatted_text, ...);
-FC_Rect FC_DrawBoxColor(FC_Font* font, FC_Target* dest, FC_Rect box, SDL_Color color, const char* formatted_text, ...);
-FC_Rect FC_DrawBoxEffect(FC_Font* font, FC_Target* dest, FC_Rect box, FC_Effect effect, const char* formatted_text, ...);
+SDL_Rect FC_DrawBox(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, const char* formatted_text, ...);
+SDL_Rect FC_DrawBoxAlign(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, FC_AlignEnum align, const char* formatted_text, ...);
+SDL_Rect FC_DrawBoxScale(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, FC_Scale scale, const char* formatted_text, ...);
+SDL_Rect FC_DrawBoxColor(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, SDL_Color color, const char* formatted_text, ...);
+SDL_Rect FC_DrawBoxEffect(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, FC_Effect effect, const char* formatted_text, ...);
 
-FC_Rect FC_DrawColumn(FC_Font* font, FC_Target* dest, float x, float y, Uint16 width, const char* formatted_text, ...);
-FC_Rect FC_DrawColumnAlign(FC_Font* font, FC_Target* dest, float x, float y, Uint16 width, FC_AlignEnum align, const char* formatted_text, ...);
-FC_Rect FC_DrawColumnScale(FC_Font* font, FC_Target* dest, float x, float y, Uint16 width, FC_Scale scale, const char* formatted_text, ...);
-FC_Rect FC_DrawColumnColor(FC_Font* font, FC_Target* dest, float x, float y, Uint16 width, SDL_Color color, const char* formatted_text, ...);
-FC_Rect FC_DrawColumnEffect(FC_Font* font, FC_Target* dest, float x, float y, Uint16 width, FC_Effect effect, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumn(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumnAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_AlignEnum align, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumnScale(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_Scale scale, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumnColor(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, SDL_Color color, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumnEffect(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_Effect effect, const char* formatted_text, ...);
 
 
 // Getters
@@ -290,7 +251,7 @@ Uint16 FC_GetHeight(FC_Font* font, const char* formatted_text, ...);
 Uint16 FC_GetWidth(FC_Font* font, const char* formatted_text, ...);
 
 // Returns a 1-pixel wide box in front of the character in the given position (index)
-FC_Rect FC_GetCharacterOffset(FC_Font* font, Uint16 position_index, int column_width, const char* formatted_text, ...);
+SDL_Rect FC_GetCharacterOffset(FC_Font* font, Uint16 position_index, int column_width, const char* formatted_text, ...);
 Uint16 FC_GetColumnHeight(FC_Font* font, Uint16 width, const char* formatted_text, ...);
 
 int FC_GetAscent(FC_Font* font, const char* formatted_text, ...);
@@ -301,9 +262,9 @@ int FC_GetLineSpacing(FC_Font* font);
 Uint16 FC_GetMaxWidth(FC_Font* font);
 SDL_Color FC_GetDefaultColor(FC_Font* font);
 
-FC_Rect FC_GetBounds(FC_Font* font, float x, float y, FC_AlignEnum align, FC_Scale scale, const char* formatted_text, ...);
+SDL_Rect FC_GetBounds(FC_Font* font, float x, float y, FC_AlignEnum align, FC_Scale scale, const char* formatted_text, ...);
 
-Uint8 FC_InRect(float x, float y, FC_Rect input_rect);
+Uint8 FC_InRect(float x, float y, SDL_Rect input_rect);
 // Given an offset (x,y) from the text draw position (the upper-left corner), returns the character position (UTF-8 index)
 Uint16 FC_GetPositionFromOffset(FC_Font* font, float x, float y, int column_width, FC_AlignEnum align, const char* formatted_text, ...);
 
@@ -316,12 +277,6 @@ void FC_SetFilterMode(FC_Font* font, FC_FilterEnum filter);
 void FC_SetSpacing(FC_Font* font, int LetterSpacing);
 void FC_SetLineSpacing(FC_Font* font, int LineSpacing);
 void FC_SetDefaultColor(FC_Font* font, SDL_Color color);
-
-
-#ifdef __cplusplus
-}
-#endif
-
 
 
 #endif

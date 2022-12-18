@@ -1,5 +1,5 @@
-#include "SDL.h"
-#include "SDL_FontCache.h"
+#include <SDL2/SDL.h>
+#include "../SDL_FontCache.h"
 
 #include <math.h>
 #include <string.h>
@@ -17,7 +17,7 @@ SDL_Renderer* renderer;
 #endif
 
 
-void draw_rect(FC_Rect rect, SDL_Color color)
+void draw_rect(SDL_Rect rect, SDL_Color color)
 {
     #ifdef SDL_GPU_VERSION_MAJOR
     GPU_Rectangle(screen, rect.x, rect.y, rect.x + rect.w - 1, rect.y + rect.h - 1, color);
@@ -30,7 +30,7 @@ void draw_rect(FC_Rect rect, SDL_Color color)
     #endif
 }
 
-void fill_rect(FC_Rect rect, SDL_Color color)
+void fill_rect(SDL_Rect rect, SDL_Color color)
 {
     #ifdef SDL_GPU_VERSION_MAJOR
     GPU_RectangleFilled(screen, rect.x, rect.y, rect.x + rect.w, rect.y + rect.h, color);
@@ -43,7 +43,7 @@ void fill_rect(FC_Rect rect, SDL_Color color)
     #endif
 }
 
-void set_clip(FC_Rect rect)
+void set_clip(SDL_Rect rect)
 {
     #ifdef SDL_GPU_VERSION_MAJOR
     GPU_SetClipRect(screen, rect);
@@ -110,31 +110,20 @@ void loop_drawSomeText()
     char input_text[2048];
     sprintf(input_text, "Edit this text.");
     int input_position = U8_strlen(input_text);
-    FC_Rect input_rect;
+    SDL_Rect input_rect;
     int mode = 0;
-
-
-    float target_w, target_h;
-    #ifdef SDL_GPU_VERSION_MAJOR
-    GPU_Target* target = screen;
-    target_w = target->w;
-    target_h = target->h;
-    #else
+    
     SDL_Renderer* target = renderer;
-    {
-        int w, h;
-        SDL_GetWindowSize(window, &w, &h);
-        target_w = w;
-        target_h = h;
-    }
-    #endif
 
-    FC_Rect leftHalf = {0, 0, 3*target_w/4.0f, target_h};
-    FC_Rect rightHalf = {leftHalf.w, 0, target_w/4.0f, target_h};
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+    
+    SDL_Rect leftHalf = {0, 0, 3*w/4, h};
+    SDL_Rect rightHalf = {leftHalf.w, 0, w/4, h};
 
-    FC_Rect box1 = {215, 50, 150, 150};
-    FC_Rect box2 = {215, box1.y + box1.h + 50, 150, 150};
-    FC_Rect box3 = {215, box2.y + box2.h + 50, 150, 150};
+    SDL_Rect box1 = {215, 50, 150, 150};
+    SDL_Rect box2 = {215, box1.y + box1.h + 50, 150, 150};
+    SDL_Rect box3 = {215, box2.y + box2.h + 50, 150, 150};
 
     SDL_Color black = {0, 0, 0, 255};
     SDL_Color white = {255, 255, 255, 255};
@@ -145,7 +134,7 @@ void loop_drawSomeText()
 
     const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
-    input_rect = FC_MakeRect(rightHalf.x, 175, rightHalf.w, 500);
+    input_rect = {rightHalf.x, 175, rightHalf.w, 500};
 
     SDL_StartTextInput();
 
@@ -236,11 +225,11 @@ void loop_drawSomeText()
             FC_Draw(font, target, rightHalf.x, 85, "Multi\nline\ntext");
 
             FC_DrawBox(font, target, input_rect, "%s", input_text);
-            draw_rect(FC_MakeRect(input_rect.x, input_rect.y + FC_GetLineHeight(font), FC_GetWidth(font, "%s", input_text), 2), black);
+            draw_rect({input_rect.x, input_rect.y + FC_GetLineHeight(font), FC_GetWidth(font, "%s", input_text), 2}, black);
 
-            FC_Rect input_cursor_pos = FC_GetCharacterOffset(font, input_position, input_rect.w, "%s", input_text);
+            SDL_Rect input_cursor_pos = FC_GetCharacterOffset(font, input_position, input_rect.w, "%s", input_text);
             if(SDL_GetTicks()%1000 < 500)
-                fill_rect(FC_MakeRect(input_rect.x + input_cursor_pos.x, input_rect.y + input_cursor_pos.y, input_cursor_pos.w, input_cursor_pos.h), FC_MakeColor(0, 0, 0, 255));
+                fill_rect({input_rect.x + input_cursor_pos.x, input_rect.y + input_cursor_pos.y, input_cursor_pos.w, input_cursor_pos.h}, FC_MakeColor(0, 0, 0, 255));
 
             FC_DrawColumn(font, target, 0, 50, 200, "column align LEFT\nColumn text wraps at the width of the column and has no maximum height.");
             FC_DrawColumnAlign(font, target, 100, 250, 200, FC_ALIGN_CENTER, "column align CENTER\nColumn text wraps at the width of the column and has no maximum height.");
@@ -252,15 +241,15 @@ void loop_drawSomeText()
             draw_rect(box3, black);
 
             set_clip(box1);
-            FC_Rect box1a = {box1.x, box1.y - scroll, box1.w, box1.h + scroll};
+            SDL_Rect box1a = {box1.x, box1.y - scroll, box1.w, box1.h + scroll};
             FC_DrawBox(font, target, box1a, "box align LEFT\nBox text wraps at the width of the box and is clipped to the maximum height.");
 
             set_clip(box2);
-            FC_Rect box2a = {box2.x, box2.y - scroll, box2.w, box2.h + scroll};
+            SDL_Rect box2a = {box2.x, box2.y - scroll, box2.w, box2.h + scroll};
             FC_DrawBoxAlign(font, target, box2a, FC_ALIGN_CENTER, "box align CENTER\nBox text wraps at the width of the box and is clipped to the maximum height.");
 
             set_clip(box3);
-            FC_Rect box3a = {box3.x, box3.y - scroll, box3.w, box3.h + scroll};
+            SDL_Rect box3a = {box3.x, box3.y - scroll, box3.w, box3.h + scroll};
             FC_DrawBoxAlign(font, target, box3a, FC_ALIGN_RIGHT, "box align RIGHT\nBox text wraps at the width of the box and is clipped to the maximum height.");
 
             unset_clip();
