@@ -1604,7 +1604,7 @@ SDL_Rect FC_Draw(FC_Font* font, SDL_Renderer* dest, float x, float y, const char
 
     set_color_for_all_caches(font, font->default_color);
 
-    return FC_RenderLeft(font, dest, x, y, FC_MakeScale(1,1), fc_buffer);
+    return FC_RenderLeft(font, dest, x, y, {1,1}, fc_buffer);
 }
 
 
@@ -1906,7 +1906,7 @@ SDL_Rect FC_DrawBox(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, const char*
 
     set_color_for_all_caches(font, font->default_color);
 
-    FC_DrawColumnFromBuffer(font, dest, box, NULL, FC_MakeScale(1,1), FC_ALIGN_LEFT);
+    FC_DrawColumnFromBuffer(font, dest, box, NULL, {1,1}, FC_ALIGN_LEFT);
 
     if(useClip)
         set_clip(dest, &oldclip);
@@ -1937,7 +1937,7 @@ SDL_Rect FC_DrawBoxAlign(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, FC_Ali
 
     set_color_for_all_caches(font, font->default_color);
 
-    FC_DrawColumnFromBuffer(font, dest, box, NULL, FC_MakeScale(1,1), align);
+    FC_DrawColumnFromBuffer(font, dest, box, NULL, {1,1}, align);
 
     if(useClip)
         set_clip(dest, &oldclip);
@@ -1999,7 +1999,7 @@ SDL_Rect FC_DrawBoxColor(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, SDL_Co
 
     set_color_for_all_caches(font, color);
 
-    FC_DrawColumnFromBuffer(font, dest, box, NULL, FC_MakeScale(1,1), FC_ALIGN_LEFT);
+    FC_DrawColumnFromBuffer(font, dest, box, NULL, {1,1}, FC_ALIGN_LEFT);
 
     if(useClip)
         set_clip(dest, &oldclip);
@@ -2052,7 +2052,7 @@ SDL_Rect FC_DrawColumn(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint
 
     set_color_for_all_caches(font, font->default_color);
 
-    FC_DrawColumnFromBuffer(font, dest, box, &total_height, FC_MakeScale(1,1), FC_ALIGN_LEFT);
+    FC_DrawColumnFromBuffer(font, dest, box, &total_height, {1,1}, FC_ALIGN_LEFT);
 
     return {box.x, box.y, width, total_height};
 }
@@ -2081,7 +2081,7 @@ SDL_Rect FC_DrawColumnAlign(FC_Font* font, SDL_Renderer* dest, float x, float y,
         break;
     }
 
-    FC_DrawColumnFromBuffer(font, dest, box, &total_height, FC_MakeScale(1,1), align);
+    FC_DrawColumnFromBuffer(font, dest, box, &total_height, {1,1}, align);
 
     return {box.x, box.y, width, total_height};
 }
@@ -2115,7 +2115,7 @@ SDL_Rect FC_DrawColumnColor(FC_Font* font, SDL_Renderer* dest, float x, float y,
 
     set_color_for_all_caches(font, color);
 
-    FC_DrawColumnFromBuffer(font, dest, box, &total_height, FC_MakeScale(1,1), FC_ALIGN_LEFT);
+    FC_DrawColumnFromBuffer(font, dest, box, &total_height, {1,1}, FC_ALIGN_LEFT);
 
     return {box.x, box.y, width, total_height};
 }
@@ -2240,13 +2240,13 @@ SDL_Rect FC_DrawAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Al
     switch(align)
     {
         case FC_ALIGN_LEFT:
-            result = FC_RenderLeft(font, dest, x, y, FC_MakeScale(1,1), fc_buffer);
+            result = FC_RenderLeft(font, dest, x, y, {1,1}, fc_buffer);
             break;
         case FC_ALIGN_CENTER:
-            result = FC_RenderCenter(font, dest, x, y, FC_MakeScale(1,1), fc_buffer);
+            result = FC_RenderCenter(font, dest, x, y, {1,1}, fc_buffer);
             break;
         case FC_ALIGN_RIGHT:
-            result = FC_RenderRight(font, dest, x, y, FC_MakeScale(1,1), fc_buffer);
+            result = FC_RenderRight(font, dest, x, y, {1,1}, fc_buffer);
             break;
         default:
             result = {x, y, 0, 0};
@@ -2265,7 +2265,7 @@ SDL_Rect FC_DrawColor(FC_Font* font, SDL_Renderer* dest, float x, float y, SDL_C
 
     set_color_for_all_caches(font, color);
 
-    return FC_RenderLeft(font, dest, x, y, FC_MakeScale(1,1), fc_buffer);
+    return FC_RenderLeft(font, dest, x, y, {1,1}, fc_buffer);
 }
 
 
@@ -2383,7 +2383,7 @@ SDL_Rect FC_GetCharacterOffset(FC_Font* font, Uint16 position_index, int column_
 
     FC_EXTRACT_VARARGS(fc_buffer, formatted_text);
 
-    ls = FC_GetBufferFitToColumn(font, column_width, FC_MakeScale(1,1), 1);
+    ls = FC_GetBufferFitToColumn(font, column_width, {1,1}, 1);
     for(iter = ls; iter != NULL;)
     {
         char* line;
@@ -2438,7 +2438,7 @@ Uint16 FC_GetColumnHeight(FC_Font* font, Uint16 width, const char* formatted_tex
 
     FC_EXTRACT_VARARGS(fc_buffer, formatted_text);
 
-    ls = FC_GetBufferFitToColumn(font, width, FC_MakeScale(1,1), 0);
+    ls = FC_GetBufferFitToColumn(font, width, {1,1}, 0);
     for(iter = ls; iter != NULL; iter = iter->next)
     {
         y += FC_GetLineHeight(font);
@@ -2631,7 +2631,7 @@ Uint16 FC_GetPositionFromOffset(FC_Font* font, float x, float y, int column_widt
 
     FC_EXTRACT_VARARGS(fc_buffer, formatted_text);
 
-    ls = FC_GetBufferFitToColumn(font, column_width, FC_MakeScale(1,1), 1);
+    ls = FC_GetBufferFitToColumn(font, column_width, {1,1}, 1);
     for(iter = ls; iter != NULL; iter = iter->next)
     {
         char* line;
@@ -2675,7 +2675,7 @@ int FC_GetWrappedText(FC_Font* font, char* result, int max_result_size, Uint16 w
 
     FC_EXTRACT_VARARGS(fc_buffer, formatted_text);
 
-    ls = FC_GetBufferFitToColumn(font, width, FC_MakeScale(1,1), 0);
+    ls = FC_GetBufferFitToColumn(font, width, {1,1}, 0);
     int size_so_far = 0;
     int size_remaining = max_result_size-1; // reserve for \0
     for(iter = ls; iter != NULL && size_remaining > 0; iter = iter->next)

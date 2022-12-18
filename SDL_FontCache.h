@@ -74,7 +74,6 @@ typedef struct FC_Effect
 // Opaque type
 typedef struct FC_Font FC_Font;
 
-
 typedef struct FC_GlyphData
 {
     SDL_Rect rect;
@@ -84,15 +83,11 @@ typedef struct FC_GlyphData
 
 
 
-
 // Object creation
-
-FC_Scale FC_MakeScale(float x, float y);
 
 FC_Effect FC_MakeEffect(FC_AlignEnum alignment, FC_Scale scale, SDL_Color color);
 
 FC_GlyphData FC_MakeGlyphData(int cache_level, Sint16 x, Sint16 y, Uint16 w, Uint16 h);
-
 
 
 // Font object
@@ -110,7 +105,6 @@ void FC_ResetFontFromRendererReset(FC_Font* font, SDL_Renderer* renderer, Uint32
 void FC_ClearFont(FC_Font* font);
 
 void FC_FreeFont(FC_Font* font);
-
 
 
 // Built-in loading strings
