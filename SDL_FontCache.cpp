@@ -203,13 +203,6 @@ char* FC_GetStringASCII_Latin1(void)
     return U8_strdup(ASCII_LATIN_1_STRING);
 }
 
-FC_Scale FC_MakeScale(float x, float y)
-{
-    FC_Scale s = {x, y};
-
-    return s;
-}
-
 FC_Effect FC_MakeEffect(FC_AlignEnum alignment, FC_Scale scale, SDL_Color color)
 {
     FC_Effect e;
@@ -412,9 +405,9 @@ struct FC_Font
 static FC_GlyphData* FC_PackGlyphData(FC_Font* font, Uint32 codepoint, Uint16 width, Uint16 maxWidth, Uint16 maxHeight);
 
 
-static SDL_Rect FC_RenderLeft(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* text);
-static SDL_Rect FC_RenderCenter(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* text);
-static SDL_Rect FC_RenderRight(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* text);
+static SDL_Rect FC_RenderLeft(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Scale scale, const char* text);
+static SDL_Rect FC_RenderCenter(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Scale scale, const char* text);
+static SDL_Rect FC_RenderRight(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Scale scale, const char* text);
 
 
 static_inline SDL_Surface* FC_CreateSurface32(Uint32 width, Uint32 height)
@@ -570,7 +563,7 @@ void U8_strdel(char* string, int position)
 
 static_inline SDL_Rect SDL_RectUnion(SDL_Rect A, SDL_Rect B)
 {
-    float x,x2,y,y2;
+    int x,x2,y,y2;
     x = FC_MIN(A.x, B.x);
     y = FC_MIN(A.y, B.y);
     x2 = FC_MAX(A.x+A.w, B.x+B.w);
@@ -627,7 +620,7 @@ static_inline SDL_Rect SDL_RectIntersect(SDL_Rect A, SDL_Rect B)
 
 
 
-SDL_Rect FC_DefaultRenderCallback(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, float x, float y, float xscale, float yscale)
+SDL_Rect FC_DefaultRenderCallback(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, int x, int y, float xscale, float yscale)
 {
     float w = srcrect->w * xscale;
     float h = srcrect->h * yscale;
@@ -659,9 +652,9 @@ SDL_Rect FC_DefaultRenderCallback(SDL_Texture* src, SDL_Rect* srcrect, SDL_Rende
     return result;
 }
 
-static SDL_Rect (*fc_render_callback)(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, float x, float y, float xscale, float yscale) = &FC_DefaultRenderCallback;
+static SDL_Rect (*fc_render_callback)(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, int x, int y, float xscale, float yscale) = &FC_DefaultRenderCallback;
 
-void FC_SetRenderCallback(SDL_Rect (*callback)(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, float x, float y, float xscale, float yscale))
+void FC_SetRenderCallback(SDL_Rect (*callback)(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, int x, int y, float xscale, float yscale))
 {
     if(callback == NULL)
         fc_render_callback = &FC_DefaultRenderCallback;
@@ -1513,7 +1506,7 @@ FC_GlyphData* FC_SetGlyphData(FC_Font* font, Uint32 codepoint, FC_GlyphData glyp
 
 
 // Drawing
-static SDL_Rect FC_RenderLeft(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* text)
+static SDL_Rect FC_RenderLeft(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Scale scale, const char* text)
 {
     const char* c = text;
     SDL_Rect srcRect;
@@ -1595,7 +1588,7 @@ static void set_color_for_all_caches(FC_Font* font, SDL_Color color)
     }
 }
 
-SDL_Rect FC_Draw(FC_Font* font, SDL_Renderer* dest, float x, float y, const char* formatted_text, ...)
+SDL_Rect FC_Draw(FC_Font* font, SDL_Renderer* dest, int x, int y, const char* formatted_text, ...)
 {
     if(formatted_text == NULL || font == NULL)
         return {x, y, 0, 0};
@@ -1799,7 +1792,7 @@ static FC_StringList* FC_ExplodeAndKeep(const char* text, char delimiter)
     return head;
 }
 
-static void FC_RenderAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, int width, FC_Scale scale, FC_AlignEnum align, const char* text)
+static void FC_RenderAlign(FC_Font* font, SDL_Renderer* dest, int x, int y, int width, FC_Scale scale, FC_AlignEnum align, const char* text)
 {
     switch(align)
     {
@@ -2040,7 +2033,7 @@ SDL_Rect FC_DrawBoxEffect(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, FC_Ef
     return box;
 }
 
-SDL_Rect FC_DrawColumn(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, const char* formatted_text, ...)
+SDL_Rect FC_DrawColumn(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, const char* formatted_text, ...)
 {
     SDL_Rect box = {x, y, width, 0};
     int total_height;
@@ -2057,7 +2050,7 @@ SDL_Rect FC_DrawColumn(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint
     return {box.x, box.y, width, total_height};
 }
 
-SDL_Rect FC_DrawColumnAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_AlignEnum align, const char* formatted_text, ...)
+SDL_Rect FC_DrawColumnAlign(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, FC_AlignEnum align, const char* formatted_text, ...)
 {
     SDL_Rect box = {x, y, width, 0};
     int total_height;
@@ -2086,7 +2079,7 @@ SDL_Rect FC_DrawColumnAlign(FC_Font* font, SDL_Renderer* dest, float x, float y,
     return {box.x, box.y, width, total_height};
 }
 
-SDL_Rect FC_DrawColumnScale(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_Scale scale, const char* formatted_text, ...)
+SDL_Rect FC_DrawColumnScale(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, FC_Scale scale, const char* formatted_text, ...)
 {
     SDL_Rect box = {x, y, width, 0};
     int total_height;
@@ -2103,7 +2096,7 @@ SDL_Rect FC_DrawColumnScale(FC_Font* font, SDL_Renderer* dest, float x, float y,
     return {box.x, box.y, width, total_height};
 }
 
-SDL_Rect FC_DrawColumnColor(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, SDL_Color color, const char* formatted_text, ...)
+SDL_Rect FC_DrawColumnColor(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, SDL_Color color, const char* formatted_text, ...)
 {
     SDL_Rect box = {x, y, width, 0};
     int total_height;
@@ -2120,7 +2113,7 @@ SDL_Rect FC_DrawColumnColor(FC_Font* font, SDL_Renderer* dest, float x, float y,
     return {box.x, box.y, width, total_height};
 }
 
-SDL_Rect FC_DrawColumnEffect(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_Effect effect, const char* formatted_text, ...)
+SDL_Rect FC_DrawColumnEffect(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, FC_Effect effect, const char* formatted_text, ...)
 {
     SDL_Rect box = {x, y, width, 0};
     int total_height;
@@ -2149,7 +2142,7 @@ SDL_Rect FC_DrawColumnEffect(FC_Font* font, SDL_Renderer* dest, float x, float y
     return {box.x, box.y, width, total_height};
 }
 
-static SDL_Rect FC_RenderCenter(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* text)
+static SDL_Rect FC_RenderCenter(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Scale scale, const char* text)
 {
     SDL_Rect result = {x, y, 0, 0};
     if(text == NULL || font == NULL)
@@ -2182,7 +2175,7 @@ static SDL_Rect FC_RenderCenter(FC_Font* font, SDL_Renderer* dest, float x, floa
     return result;
 }
 
-static SDL_Rect FC_RenderRight(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* text)
+static SDL_Rect FC_RenderRight(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Scale scale, const char* text)
 {
     SDL_Rect result = {x, y, 0, 0};
     if(text == NULL || font == NULL)
@@ -2215,7 +2208,7 @@ static SDL_Rect FC_RenderRight(FC_Font* font, SDL_Renderer* dest, float x, float
 
 
 
-SDL_Rect FC_DrawScale(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* formatted_text, ...)
+SDL_Rect FC_DrawScale(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Scale scale, const char* formatted_text, ...)
 {
     if(formatted_text == NULL || font == NULL)
         return {x, y, 0, 0};
@@ -2227,7 +2220,7 @@ SDL_Rect FC_DrawScale(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Sc
     return FC_RenderLeft(font, dest, x, y, scale, fc_buffer);
 }
 
-SDL_Rect FC_DrawAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_AlignEnum align, const char* formatted_text, ...)
+SDL_Rect FC_DrawAlign(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_AlignEnum align, const char* formatted_text, ...)
 {
     if(formatted_text == NULL || font == NULL)
         return {x, y, 0, 0};
@@ -2256,7 +2249,7 @@ SDL_Rect FC_DrawAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Al
     return result;
 }
 
-SDL_Rect FC_DrawColor(FC_Font* font, SDL_Renderer* dest, float x, float y, SDL_Color color, const char* formatted_text, ...)
+SDL_Rect FC_DrawColor(FC_Font* font, SDL_Renderer* dest, int x, int y, SDL_Color color, const char* formatted_text, ...)
 {
     if(formatted_text == NULL || font == NULL)
         return {x, y, 0, 0};
@@ -2269,7 +2262,7 @@ SDL_Rect FC_DrawColor(FC_Font* font, SDL_Renderer* dest, float x, float y, SDL_C
 }
 
 
-SDL_Rect FC_DrawEffect(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Effect effect, const char* formatted_text, ...)
+SDL_Rect FC_DrawEffect(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Effect effect, const char* formatted_text, ...)
 {
     if(formatted_text == NULL || font == NULL)
         return {x, y, 0, 0};
@@ -2577,7 +2570,7 @@ SDL_Color FC_GetDefaultColor(FC_Font* font)
     return font->default_color;
 }
 
-SDL_Rect FC_GetBounds(FC_Font* font, float x, float y, FC_AlignEnum align, FC_Scale scale, const char* formatted_text, ...)
+SDL_Rect FC_GetBounds(FC_Font* font, int x, int y, FC_AlignEnum align, FC_Scale scale, const char* formatted_text, ...)
 {
     SDL_Rect result = {x, y, 0, 0};
 
@@ -2610,13 +2603,13 @@ SDL_Rect FC_GetBounds(FC_Font* font, float x, float y, FC_AlignEnum align, FC_Sc
     return result;
 }
 
-Uint8 FC_InRect(float x, float y, SDL_Rect input_rect)
+Uint8 FC_InRect(int x, int y, SDL_Rect input_rect)
 {
     return (input_rect.x <= x && x <= input_rect.x + input_rect.w && input_rect.y <= y && y <= input_rect.y + input_rect.h);
 }
 
 // TODO: Make it work with alignment
-Uint16 FC_GetPositionFromOffset(FC_Font* font, float x, float y, int column_width, FC_AlignEnum align, const char* formatted_text, ...)
+Uint16 FC_GetPositionFromOffset(FC_Font* font, int x, int y, int column_width, FC_AlignEnum align, const char* formatted_text, ...)
 {
     FC_StringList *ls, *iter;
     Uint8 done = 0;

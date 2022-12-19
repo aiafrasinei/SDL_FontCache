@@ -180,9 +180,9 @@ unsigned int FC_GetTabWidth(void);
 /*! Changes the width of a horizontal tab in multiples of the width of a space (default: 4) */
 void FC_SetTabWidth(unsigned int width_in_spaces);
 
-void FC_SetRenderCallback(SDL_Rect (*callback)(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, float x, float y, float xscale, float yscale));
+void FC_SetRenderCallback(SDL_Rect (*callback)(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, int x, int y, float xscale, float yscale));
 
-SDL_Rect FC_DefaultRenderCallback(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, float x, float y, float xscale, float yscale);
+SDL_Rect FC_DefaultRenderCallback(SDL_Texture* src, SDL_Rect* srcrect, SDL_Renderer* dest, int x, int y, float xscale, float yscale);
 
 
 // Custom caching
@@ -216,11 +216,11 @@ FC_GlyphData* FC_SetGlyphData(FC_Font* font, Uint32 codepoint, FC_GlyphData glyp
 
 // Rendering
 
-SDL_Rect FC_Draw(FC_Font* font, SDL_Renderer* dest, float x, float y, const char* formatted_text, ...);
-SDL_Rect FC_DrawAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_AlignEnum align, const char* formatted_text, ...);
-SDL_Rect FC_DrawScale(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Scale scale, const char* formatted_text, ...);
-SDL_Rect FC_DrawColor(FC_Font* font, SDL_Renderer* dest, float x, float y, SDL_Color color, const char* formatted_text, ...);
-SDL_Rect FC_DrawEffect(FC_Font* font, SDL_Renderer* dest, float x, float y, FC_Effect effect, const char* formatted_text, ...);
+SDL_Rect FC_Draw(FC_Font* font, SDL_Renderer* dest, int x, int y, const char* formatted_text, ...);
+SDL_Rect FC_DrawAlign(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_AlignEnum align, const char* formatted_text, ...);
+SDL_Rect FC_DrawScale(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Scale scale, const char* formatted_text, ...);
+SDL_Rect FC_DrawColor(FC_Font* font, SDL_Renderer* dest, int x, int y, SDL_Color color, const char* formatted_text, ...);
+SDL_Rect FC_DrawEffect(FC_Font* font, SDL_Renderer* dest, int x, int y, FC_Effect effect, const char* formatted_text, ...);
 
 SDL_Rect FC_DrawBox(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, const char* formatted_text, ...);
 SDL_Rect FC_DrawBoxAlign(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, FC_AlignEnum align, const char* formatted_text, ...);
@@ -228,11 +228,11 @@ SDL_Rect FC_DrawBoxScale(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, FC_Sca
 SDL_Rect FC_DrawBoxColor(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, SDL_Color color, const char* formatted_text, ...);
 SDL_Rect FC_DrawBoxEffect(FC_Font* font, SDL_Renderer* dest, SDL_Rect box, FC_Effect effect, const char* formatted_text, ...);
 
-SDL_Rect FC_DrawColumn(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, const char* formatted_text, ...);
-SDL_Rect FC_DrawColumnAlign(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_AlignEnum align, const char* formatted_text, ...);
-SDL_Rect FC_DrawColumnScale(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_Scale scale, const char* formatted_text, ...);
-SDL_Rect FC_DrawColumnColor(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, SDL_Color color, const char* formatted_text, ...);
-SDL_Rect FC_DrawColumnEffect(FC_Font* font, SDL_Renderer* dest, float x, float y, Uint16 width, FC_Effect effect, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumn(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumnAlign(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, FC_AlignEnum align, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumnScale(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, FC_Scale scale, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumnColor(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, SDL_Color color, const char* formatted_text, ...);
+SDL_Rect FC_DrawColumnEffect(FC_Font* font, SDL_Renderer* dest, int x, int y, Uint16 width, FC_Effect effect, const char* formatted_text, ...);
 
 
 // Getters
@@ -254,11 +254,11 @@ int FC_GetLineSpacing(FC_Font* font);
 Uint16 FC_GetMaxWidth(FC_Font* font);
 SDL_Color FC_GetDefaultColor(FC_Font* font);
 
-SDL_Rect FC_GetBounds(FC_Font* font, float x, float y, FC_AlignEnum align, FC_Scale scale, const char* formatted_text, ...);
+SDL_Rect FC_GetBounds(FC_Font* font, int x, int y, FC_AlignEnum align, FC_Scale scale, const char* formatted_text, ...);
 
-Uint8 FC_InRect(float x, float y, SDL_Rect input_rect);
+Uint8 FC_InRect(int x, int y, SDL_Rect input_rect);
 // Given an offset (x,y) from the text draw position (the upper-left corner), returns the character position (UTF-8 index)
-Uint16 FC_GetPositionFromOffset(FC_Font* font, float x, float y, int column_width, FC_AlignEnum align, const char* formatted_text, ...);
+Uint16 FC_GetPositionFromOffset(FC_Font* font, int x, int y, int column_width, FC_AlignEnum align, const char* formatted_text, ...);
 
 // Returns the number of characters in the new wrapped text written into `result`.
 int FC_GetWrappedText(FC_Font* font, char* result, int max_result_size, Uint16 width, const char* formatted_text, ...);
