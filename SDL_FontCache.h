@@ -135,7 +135,7 @@ void FC_GetUTF8FromCodepoint(char* result, Uint32 codepoint);
 
 // UTF-8 string operations
 
-/*! Allocates a new string of 'size' bytes that is already NULL-terminated.  The NULL byte counts toward the size limit, as usual.  Returns NULL if size is 0. */
+/*! Allocates a new string of 'size' bytes that is already nullptr-terminated.  The nullptr byte counts toward the size limit, as usual.  Returns nullptr if size is 0. */
 char* U8_alloc(unsigned int size);
 
 /*! Deallocates the given string. */
